@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<style>
+canvas {
+    border:1px solid #d3d3d3;
+    background-color: #f1f1f1;
+}
+</style>
+</head>
+    <body onload="initGameArea()" onresize="myGameArea.setWindowSize()">
+        <table id="pageFrame" style="background-color: white; border-style:solid; border-color: #f8dcb4 "> 
+            <th colspan="3">
+                CS 326 Project 4 Javascript game<br>
+                Kristen Kaiser
+            </th>
+            <tr>
+                <td colspan="3">
+                    <canvas id="gameCanvas" onmousedown="hitCheck()" >
+
+                    </canvas>
+                    
+                </td>
+            </tr>
+
+            <tr> 
+                <td>
+                    <button type="startButton" onclick="myGameArea.updateInterval()">START</button> 
+                </td>
+                <td> 
+                    <form>
+                        Speed: <input type="number" id="speed" size="6" min="0" > 
+                    </form>
+                </td>
+                <td>
+                    <button type="endButton" onclick="myGameArea.stopInterval()">END</button> 
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <form>
+                    Hits: <input type="number" id="hits" size="6" disabled>
+                    </form>
+                </td>
+                <td colspan="2">
+                    <form>
+                    Current Position: X: <input type="text" id="xPos" size="6" disabled> Y: <input type="text" id="yPos" size="6"  disabled>
+                    </form>
+                </td>
+            </tr>
+
+        
+
+
+            
+        </table>
+        <!--
+        POSX: <input type="text" id="posxError"><br>
+        POSY: <input type="text" id="posyError"><br>
+        -->
+
+
+        <script>
+        //var pageFrame =   document.getElementById("pageFrame");  
+        var gameCanvas = document.getElementById("gameCanvas");  
+        var myGamePiece;
+        var isRunning = false;
+        var popupImage;
+
+        function initGameArea() {
+            myGamePiece = new component(200, 150, popupImage, 0, 0);
+            myGameArea.start();
+            initImage();
+
+        }
+        function initImage (){
+            const canvas = document.getElementById("gameCanvas");
+            const ctx = canvas.getContext("2d");
+            const img1 = new Image();
+            img1.src = './virus.png';
+            img1.onload = saveImage;
+            function saveImage(){
+                //myGamePiece.Image= img1;
+               popupImage = img1; 
+            }
+
+        }
+
+        var myGameArea = {
+            canvas : document.getElementById("gameCanvas"),
+            
+            start : function() {
+                this.setWindowSize();
+                this.context = this.canvas.getContext("2d");
+                document.getElementById("hits").value = 0;
+                document.getElementById("speed").value = 1000;
+            },
+
+            setWindowSize : function(){
+                //alert("You have changed the size of the browser window!");
+                this.canvas.width = window.innerWidth - 50; // 50 accounts for frame border
+                this.canvas.height = window.innerHeight - 138;
+                this.canvas.style.backgroundColor = '#008080'
+            },
+            clear : function() {
+                this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+            },
+            updateInterval : function(){
+                if(isRunning == false){
+                    document.getElementById("hits").value = 0;
+                    speed = document.getElementById("speed").value;
+                    this.interval = setInterval(updateGameArea, speed);
+                    isRunning = true;
+                }
+            },
+            stopInterval : function(){
+                if(isRunning == true){
+                    clearInterval(this.interval);
+                    isRunning = false;
+                }
+            }
+
+        }
+
+        function component(width, height, color, x, y) {
+            
+            const canvas = document.getElementById("gameCanvas");
+            const ctx = canvas.getContext("2d");
+            
+            
+            this.width = width;
+            this.height = height;
+            this.x = x;
+            this.y = y;    
+
+            this.update = function(){
+                const canvas = document.getElementById("gameCanvas");
+                const ctx = canvas.getContext("2d");
+                //ctx.fillStyle = color;
+                //ctx.fillRect(this.x, this.y, this.width, this.height);
+                ctx.drawImage(popupImage, this.x, this.y, width, height);
+            }
+            
+        }
+
+        function hitCheck() {
+            var hits = parseInt(document.getElementById("hits").value);
+            var e = window.event;
+            var mouseX = parseInt(e.clientX) - 15;
+            var mouseY = parseInt(e.clientY) - 55 ;
+            var offsetX = parseInt(myGamePiece.width) ;        
+            var offsetY = parseInt(myGamePiece.height) ;
+            var objX = parseInt(document.getElementById("xPos").value);
+            var objY = parseInt(document.getElementById("yPos").value);
+
+            //document.getElementById("posxError").value = mouseX;
+            //document.getElementById("posyError").value = mouseY;
+            
+            if(  objX < mouseX && mouseX < (objX + offsetX)){
+                if(objY < mouseY && mouseY < objY + offsetY){
+                    if(isRunning){
+                    document.getElementById("hits").value = hits + 1;
+                    }
+                }
+            }
+        }
+
+        function updateGameArea() {
+            var xPos = document.getElementById("xPos")
+            var yPos = document.getElementById("yPos")
+            xPos.value = Math.floor(Math.random() * (window.innerWidth - myGamePiece.width - 15)) + 1;
+            yPos.value = Math.floor(Math.random() * (window.innerHeight - myGamePiece.height -55)) + 1;
+            myGameArea.clear();
+            myGamePiece.x = xPos.value;
+            myGamePiece.y = yPos.value;
+            myGamePiece.update();
+        }
+        
+
+        </script>
+    </body>
+</html>

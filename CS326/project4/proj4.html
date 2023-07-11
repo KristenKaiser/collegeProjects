@@ -1,0 +1,109 @@
+
+<!DOCTYPE html>
+<html>
+<style>
+    table, th, td {
+        border: 1px solid black;
+    }
+</style>
+<body>
+    <h>CS 326 Javascript Car Loan Calculator<br>
+    Kristen Kaiser</h><br><br>
+    <form id="loanData" style="background-color: #f8dcb4; width: fit-content; border-style: solid; border-color: #f8dcb4 ">
+        Car Cost Amount: <input type="text" id="inCost" name="inCost" value=" "><br>
+        Down Payment: <input type="text" id="inDownPay" name="inDownPay" value=" "><br>
+        Annual Intrest Rate: <input type="text" id="inIntrest" name="inIntrest" value=" "><br>
+        Term (in years) (1-6): <input type="text" id="inCarTerm" name="inCarTerm" value=" "><br>
+        <input type="button" onclick="getInput()" value="Submit"><br><br>
+        <input type="button" onclick="clearValues()" value="Clear"><br><br>
+        Monthly Payments:  <input type="text" id="monthly" name="monthly" value=" " disabled> <br>
+
+        Total Payments: <input type="text" id="total" name="total" value=" " disabled> <br>
+
+        Payment Schedule: <br>
+
+
+
+        <table id="paySchedTable" style="background-color: white; border-style:solid; border-color: #f8dcb4 ">
+            <tr>
+                <th>Car Payment Number</th>
+                <th>Intrest</th>
+                <th>Principal</th>
+                <th>Balance</th>
+            </tr>
+        </table>
+    </form>
+
+    <script>
+        function getInput() {
+            var x = document.getElementById("loanData");
+
+
+            var cost = x.elements[0].value;
+            if (isNaN(cost)) { alert("Car Cost Amount must be a number"); }
+            if (cost <= 0) { alert("Car Cost Amount must be greater than $0.00") }
+            if (cost > 50000) { alert("Car Cost Amount cannot be greater than $500,000.00") }
+
+            var downPay = x.elements[1].value;
+            if (isNaN(downPay)) { alert("Down Payment must be a number"); }
+
+            var intrest = x.elements[2].value;
+            if (isNaN(intrest)) { alert("Annual Intrest Rate must be a number"); }
+            if (intrest < 0) { alert("Annual Intrest Rate cannon be less than 0") }
+            else if (intrest > 15) { alert("Annual Intrest Rate cannot be greater than 15 percent") }
+            intrest = (intrest / 12) / 100;
+
+
+            var term = x.elements[3].value;
+            if (isNaN(term)) { alert("Term must be a number"); }
+            if (term < 1) { alert("Term must be a least 1 year") }
+            else if (term > 6) { "Term cannot be more that 6 years" }
+            term = term * 12
+
+
+            var debt = cost - downPay;
+            var perMonth = payment(debt, intrest, term);
+
+            document.getElementById("monthly").value = "$" + perMonth.toFixed(2);
+            document.getElementById("total").value = "$" + (perMonth * term).toFixed(2);
+
+
+            var count = 1;
+            var t = document.getElementById("paySchedTable");
+            while (debt > perMonth) {
+                var row = t.insertRow(count);
+                var numCol = row.insertCell(0);
+                var downCol = row.insertCell(1);
+                var intrestCol = row.insertCell(2);
+                var termCol = row.insertCell(3);
+                numCol.innerHTML = count;
+                downCol.innerHTML = (debt * intrest).toFixed(2);
+                intrestCol.innerHTML = (perMonth - (debt * intrest)).toFixed(2);
+                termCol.innerHTML = (debt - (perMonth - (debt * intrest))).toFixed(2);
+
+                debt = debt - (perMonth - (debt * intrest));
+                count = count + 1;
+            }
+
+        }
+
+        function payment(principal, irate, totalMonths) {
+            var bill = irate * Math.pow((1 + irate), totalMonths);
+            bill = bill / (Math.pow((1 + irate), totalMonths) - 1.0);
+            bill = bill * principal;
+            return bill;
+        }
+
+        function clearValues() {
+            document.getElementById("inCost").value = "";
+            document.getElementById("inDownPay").value = "";
+            document.getElementById("inIntrest").value = "";
+            document.getElementById("inCarTerm").value = "";
+            document.getElementById("monthly").value = "";
+            document.getElementById("total").value = "";
+        }
+
+    </script>
+
+</body>
+</html >

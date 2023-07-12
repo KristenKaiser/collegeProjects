@@ -1,2 +1,2 @@
 # collegeProjects
-a selection of project I completed at UNLV
+A selection of the most interesting projects I completed at UNLV.
